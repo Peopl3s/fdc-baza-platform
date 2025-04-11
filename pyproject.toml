@@ -1,7 +1,7 @@
 [project]
 name = "fdc-baza-platform"
 version = "0.1.0"
-description = "Add your description here"
+description = "Описание вашего проекта"  # Замените на реальное описание
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -11,8 +11,101 @@ dependencies = [
     "granian>=2.2.3",
     "litestar>=2.15.2",
     "litestar-asyncpg>=0.3.0",
+    "sqlalchemy>=2.0.40",
+]
+
+[project.optional-dependencies]
+dev = [
     "pytest>=8.3.5",
     "pytest-asyncio>=0.26.0",
     "ruff>=0.11.5",
-    "sqlalchemy>=2.0.40",
+    "mypy>=1.8.0",
+    "coverage>=7.4.0",
 ]
+
+[tool.ruff]
+select = ["ALL"]
+ignore = [
+    "ANN101",
+    "ANN102",
+    "ANN401",
+    "ARG001",
+    "ARG002",
+    "TID252",
+    "RUF001",
+    "RUF002",
+    "FBT001",
+    "FBT002",
+    "PTH118",
+    "PTH122",
+    "S101",
+    "A001",
+    "A003",
+    "D100",
+    "D101",
+    "D102",
+    "D103",
+    "D105",
+    "D106",
+    "D107",
+    "D211",
+    "D213",
+    "D404",
+    "EXE002",
+    "COM812",
+    "PLR0913",
+    "ERA001",
+]
+line-length = 100
+src = ["src"]
+ignore-init-module-imports = true
+target-version = "py312"
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    "**/migrations/**",
+    "__init__.py",
+    "apps.py",
+    "**/tests/**",
+    "**/common/**",
+    "alembic",
+]
+
+[tool.ruff.lint.isort]
+known_first_party = ["api", "config", "domain", "test_domain", "fixtures"]
+no-sections = false
+src_paths = ["src"]
+multi_line_output = 3
+line_length = 100
+include_trailing_comma = true
+
+[tool.coverage.run]
+omit = ["src/tests/*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[build-system]
+requires = ["setuptools>=64.0", "wheel>=0.38"]
+build-backend = "setuptools.build_meta"
