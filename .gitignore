@@ -172,3 +172,14 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Direnv files
+.direnv
+.envrc
+
+# Virtual env
+.venv
+
+# Editor specific files and folders
+.idea
+.vscode
