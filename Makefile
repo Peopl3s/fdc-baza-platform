@@ -10,6 +10,13 @@ run:
 # Запускаем тесты
 test:
 	uv run pytest
+
+test-coverage:
+	uv run coverage run -m pytest
+
+test-coverage-report:
+	uv run coverage report --show-missing
+
 # Проверяем линтером
 check:
 	@echo Running project linters...

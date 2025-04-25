@@ -8,6 +8,7 @@ dependencies = [
     "advanced-alchemy>=1.1.1",
     "alembic>=1.15.2",
     "asyncpg>=0.30.0",
+    "coverage>=7.8.0",
     "dishka>=1.5.2",
     "granian>=2.2.3",
     "litestar>=2.15.2",
@@ -94,12 +95,8 @@ exclude = [
 ]
 
 [tool.ruff.lint.isort]
-known_first_party = ["api", "config", "domain", "test_domain", "fixtures"]
+known-first-party = ["api", "config", "domain", "test_domain", "fixtures"]
 no-sections = false
-src_paths = ["src"]
-multi_line_output = 3
-line_length = 100
-include_trailing_comma = true
 
 [tool.coverage.run]
 omit = ["src/tests/*"]

@@ -1,15 +1,71 @@
+version: "3.8"
+
 services:
-  postgres:
-    image: postgres
-    container_name: postgres
-    hostname: postgres
+  app:
+    build:
+      context: .
+    command: granian --interface asgi --host 0.0.0.0 --port 7500 app:app
+    env_file:
+      - .env
     ports:
-      - 5432:5432
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: ltcats_test_db
+      - "${EXTERNAL_PORT:-7500}:7500"
+    depends_on:
+      db:
+        condition: service_healthy
+      keydb:
+        condition: service_healthy
+    networks:
+      - fdc
+    restart: unless-stopped  # Добавлено для автоматического перезапуска
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7500/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  keydb:
+    image: eqalpha/keydb:latest
+    container_name: keydb
+    ports:
+      - "6379:6379"
     volumes:
-      - "postgres-data:/var/lib/postgesql"
+      - keydb_data:/data
+    restart: unless-stopped
+    networks:
+      - fdc
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  db:
+    image: postgres:15-alpine  # Используем конкретную версию и alpine для экономии места
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 3s
+    networks:
+      - fdc
+    restart: unless-stopped
+
 volumes:
-  postgres-data:
+  postgres_data:
+    name: fdc_postgres_data
+  keydb_data:
+    name: fdc_keydb_data
+
+networks:
+  fdc:
+    driver: bridge
