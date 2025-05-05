@@ -10,56 +10,90 @@
 Деплой в стейдж/прод происходит только из релизной ветки
 
 ------------------------------
-
 ```
 project/
 ├── src/
-│   ├── domain/                # Ядро бизнес-логики (чистый слой)
-│   │   ├── models/            # Сущности и Value Objects
-│   │   │   └── user.py        # Пример: User entity
-│   │   ├── repositories/      # Интерфейсы репозиториев (абстракции)
-│   │   │   └── user_repository.py
-│   │   └── services/         # Доменные сервисы
-│   │       └── user_service.py
+│   ├── core/                  # Общие компоненты ядра
+│   │   ├── exceptions.py
+│   │   ├── dependencies.py
+│   │   ├── middlewares.py
+│   │   └── logging.py
 │   │
-│   ├── application/          # Слой приложения (use cases)
-│   │   ├── dto/              # Data Transfer Objects
-│   │   │   └── user_dto.py
-│   │   ├── use_cases/        # Юзкейсы
-│   │   │   └── user_use_cases.py
-│   │   └── exceptions.py     # Кастомные исключения приложения
-│   │
-│   ├── infrastructure/        # Внешние детали (реализации)
-│   │   ├── db/               # Работа с БД
+│   ├── users/                 # Модуль Users
+│   │   ├── domain/            # Ядро бизнес-логики Users (чистый слой)
+│   │   │   ├── entities/      # Сущности и VO
+│   │   │   │   └── user.py
+│   │   │   ├── repositories/  # Интерфейсы репозиториев (абстракции)
+│   │   │   │   └── user_repository.py
+│   │   │   └── services/     # Доменные сервисы
+│   │   │       └── user_service.py
+│   │   │
+│   │   ├── application/       # Слой приложения
+│   │   │     ├── dto/              # Data Transfer Objects
+│   │   │     │   └── user_dto.py
+│   │   │     ├── use_cases/        # Юзкейсы
+│   │   │     │   └── user_use_cases.py
+│   │   │     └── exceptions.py     # Кастомные исключения приложения
+│   │   │
+│   │   ├── infrastructure/     # Внешние детали (реализации) Users
 │   │   │   ├── models/       # ORM-модели (SQLAlchemy, Prisma и т.д.)
 │   │   │   │   └── user_model.py
 │   │   │   ├── repositories/ # Реализации репозиториев
-│   │   │   │   └── user_repository_impl.py
-│   │   │   └── database.py   # Инициализация подключения к БД
+│   │   │       └── user_repository_impl.py
 │   │   │
-│   │   ├── config/           # Конфигурация приложения
-│   │   │   └── settings.py
-│   │   └── logging/          # Логирование (если нужно)
+│   │   └── presentation/             # Слой представления (API, CLI и т.д.) Users
+│   │       ├── api/                  # REST/gRPC контроллеры
+│   │       │   ├── controllers/
+│   │       │   │   ├── user_controller.py
+│   │       │   └── routers.py        # Роутеры Litestar
+│   │       │   └── exceptions.py     # Обработчики исключений API
+│   │       ├── schemas/              # Pydantic-схемы для запросов/ответов
+│   │          └── user_schema.py
 │   │
-│   ├── presentation/          # Слой представления (API, CLI и т.д.)
-│   │   ├── api/              # REST/gRPC контроллеры
-│   │   │   ├── controllers/
-│   │   │   │   └── user_controller.py
-│   │   │   ├── routers.py    # Роутеры Litestar
-│   │   │   └── exceptions.py # Обработчики исключений API
-│   │   └── schemas/          # Pydantic-схемы для запросов/ответов
-│   │       └── user_schema.py
+│   ├── companies/             # Аналогичная структура для Companies
+│   ├── items/                 # Аналогичная структура для Items
 │   │
-│   └── main.py               # Точка входа (создание приложения Litestar)
+│   ├── infrastructure/        # Общая инфраструктура
+│   │   ├── db/
+│   │   └──  config/
+│   │
+│   └── main.py               # Инициализация приложения
+│   └── settings.py           # Настройки
 │
-├── tests/                    # Тесты (можно зеркалить структуру src)
-│   ├── unit/
-│   ├── integration/
-│   └── e2e/
+├── tests/
+│   ├── users/                # Тесты для модуля Users
+│   ├── companies/            # Тесты для Companies
+│   └── ...
 │
-├── pyproject.toml            # Зависимости и настройки проекта
+├── pyproject.toml
 └── README.md
 ```
+
+Ключевые изменения:
+
+1. **Доменно-ориентированная организация**:
+   - Каждый бизнес-домен (users, companies, items) имеет свою собственную структуру с полным циклом зависимостей (от domain до presentation)
+
+2. **Четкие границы модулей**:
+   - Модули зависят только от core и infrastructure
+   - Зависимости между модулями только через интерфейсы
+
+3. **Общая инфраструктура**:
+   - Общие технические компоненты (БД, конфиг, аутентификация) вынесены в общий infrastructure
+
+4. **Тестирование**:
+   - Тесты зеркалят структуру модулей
+
+Пример зависимостей для модуля Users:
+```
+presentation → application → domain
+application ← infrastructure (реализации репозиториев)
+```
+
+Для добавления нового модуля (например, `products`):
+1. Создаете папку `products` с той же структурой
+2. Регистрируете его роутеры в main.py
+3. Добавляете тесты в `tests/products/`****
 
 ### Пояснения:
 1. **Domain**:
@@ -79,60 +113,3 @@ project/
 4. **Presentation**:
    - Контроллеры Litestar, роутеры, Pydantic-схемы.
    - Зависит от `application`, но не от `infrastructure`.
-
-### Пример кода:
-#### `domain/models/user.py`
-```python
-from dataclasses import dataclass
-
-@dataclass
-class User:
-    id: int | None
-    email: str
-    is_active: bool
-```
-
-#### `application/use_cases/user_use_cases.py`
-```python
-from domain.repositories.user_repository import UserRepository
-from domain.models.user import User
-
-class UserUseCases:
-    def __init__(self, user_repo: UserRepository):
-        self.user_repo = user_repo
-
-    async def get_user(self, user_id: int) -> User:
-        return await self.user_repo.get_by_id(user_id)
-```
-
-#### `presentation/api/controllers/user_controller.py`
-```python
-from litestar import Controller, get
-from application.use_cases.user_use_cases import UserUseCases
-from presentation.schemas.user_schema import UserSchema
-
-class UserController(Controller):
-    path = "/users"
-
-    @get(path="/{user_id:int}")
-    async def get_user(self, user_id: int, use_cases: UserUseCases) -> UserSchema:
-        user = await use_cases.get_user(user_id)
-        return UserSchema.from_domain(user)
-```
-
-#### `main.py`
-```python
-from litestar import Litestar
-from infrastructure.db.database import db_config
-from presentation.api.routers import user_router
-
-app = Litestar(
-    route_handlers=[user_router],
-    dependencies={"db_config": db_config}
-)
-```
-
-### Ключевые моменты:
-- **Инверсия зависимостей**: `domain` не знает о других слоях.
-- **Инъекция зависимостей**: Litestar DI внедряет реализации (например, репозитории) в use cases.
-- **Тестируемость**: Можно легко мокировать репозитории в тестах.
