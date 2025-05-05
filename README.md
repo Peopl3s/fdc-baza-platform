@@ -36,10 +36,11 @@ project/
 │   │   │     └── exceptions.py     # Кастомные исключения приложения
 │   │   │
 │   │   ├── infrastructure/     # Внешние детали (реализации) Users
-│   │   │   ├── models/       # ORM-модели (SQLAlchemy, Prisma и т.д.)
-│   │   │   │   └── user_model.py
-│   │   │   ├── repositories/ # Реализации репозиториев
-│   │   │       └── user_repository_impl.py
+│   │   │   ├── db/
+│   │   │      ├── models/       # ORM-модели (SQLAlchemy, Prisma и т.д.)
+│   │   │      │   └── user_model.py
+│   │   │      ├── repositories/ # Реализации репозиториев
+│   │   │          └── user_repository_impl.py
 │   │   │
 │   │   └── presentation/             # Слой представления (API, CLI и т.д.) Users
 │   │       ├── api/                  # REST/gRPC контроллеры
@@ -52,10 +53,6 @@ project/
 │   │
 │   ├── companies/             # Аналогичная структура для Companies
 │   ├── items/                 # Аналогичная структура для Items
-│   │
-│   ├── infrastructure/        # Общая инфраструктура
-│   │   ├── db/
-│   │   └──  config/
 │   │
 │   └── main.py               # Инициализация приложения
 │   └── settings.py           # Настройки
