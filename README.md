@@ -16,13 +16,14 @@
 ├── pyproject.toml
 ├── uv.lock
 ├── src/
-│   ├── config.py   # Конфигурация
 │   ├── main.py   # Инициализация приложения
+│   ├── config/   # Конфигурация
+│   │   └── base.py
+│   │   └── logging.py
 │   │  
-│   ├── core/     # Общие компоненты
+│   ├── common/     # Общие компоненты
 │   │   ├── dependencies.py   # DI
 │   │   ├── exceptions.py   # Кастомные исключения
-│   │   ├── logging.py   # Логирование
 │   │   └── utils.py   # Вспомогательные функции
 │   │  
 │   ├── application/   # Слой приложения
