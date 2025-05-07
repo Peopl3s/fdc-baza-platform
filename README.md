@@ -55,6 +55,7 @@
 │   │  
 │   ├── presentation/   # Слой представления (API, CLI и т.д.)
 │   │   └── api/   # API
+│   │       └── middlewares.py
 │   │       └── v1/
 │   │           ├── exeptions.py   # Исключений API
 │   │           ├── routers.py     # Роутеры Litestar
